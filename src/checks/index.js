@@ -4,6 +4,7 @@ import cookies from './cookies.js';
 import cors from './cors.js';
 import crossOrigin from './cross-origin.js';
 import csp from './csp.js';
+import deprecated from './deprecated.js';
 import disclosure from './disclosure.js';
 import framing from './framing.js';
 import hsts from './hsts.js';
@@ -23,4 +24,5 @@ export const CHECKS = Object.freeze([
   cors,
   caching,
   disclosure,
+  deprecated,
 ]);
