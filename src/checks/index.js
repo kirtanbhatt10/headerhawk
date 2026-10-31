@@ -1,4 +1,5 @@
 import contentTypeOptions from './content-type-options.js';
+import cookies from './cookies.js';
 import crossOrigin from './cross-origin.js';
 import csp from './csp.js';
 import framing from './framing.js';
@@ -15,4 +16,5 @@ export const CHECKS = Object.freeze([
   referrerPolicy,
   permissionsPolicy,
   crossOrigin,
+  cookies,
 ]);
