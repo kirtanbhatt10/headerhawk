@@ -1,0 +1,43 @@
+{
+  "name": "headerhawk",
+  "version": "0.1.0",
+  "description": "Zero-dependency HTTP security header and cookie auditor with A+ to F grades, SARIF output and CI gating",
+  "type": "module",
+  "bin": {
+    "headerhawk": "bin/headerhawk.js"
+  },
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check bin/headerhawk.js && node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "security",
+    "http-headers",
+    "csp",
+    "hsts",
+    "cookies",
+    "sarif",
+    "cli",
+    "appsec"
+  ],
+  "author": "Kirtan Bhatt <kirtan11bhatt@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kirtanbhatt10/headerhawk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kirtanbhatt10/headerhawk/issues"
+  },
+  "homepage": "https://github.com/kirtanbhatt10/headerhawk#readme"
+}
