@@ -57,3 +57,35 @@ export class HeaderSet {
     return set;
   }
 }
+
+/**
+ * Parse a raw header dump such as the output of `curl -sI` or browser devtools.
+ * With several responses (e.g. `curl -sIL`), the last one is used.
+ * @returns {{status: number|null, headers: HeaderSet}}
+ */
+export function parseRaw(text) {
+  const blocks = String(text).replace(/\r\n?/g, '\n').split(/\n\s*\n/).filter((b) => b.trim());
+  const responseBlocks = blocks.filter((b) => /^HTTP\/[\d.]+\s+\d{3}/i.test(b.trimStart()));
+  const block = (responseBlocks.length ? responseBlocks.at(-1) : blocks[0]) ?? '';
+  const headers = new HeaderSet();
+  let status = null;
+  let last = null;
+  for (const line of block.split('\n')) {
+    const statusMatch = line.match(/^HTTP\/[\d.]+\s+(\d{3})/i);
+    if (statusMatch) {
+      status = Number(statusMatch[1]);
+      continue;
+    }
+    if (/^[ \t]/.test(line) && last) {
+      // obsolete line folding: continuation of the previous header
+      const values = headers.map.get(last);
+      values[values.length - 1] += ` ${line.trim()}`;
+      continue;
+    }
+    const idx = line.indexOf(':');
+    if (idx <= 0) continue;
+    last = line.slice(0, idx).trim().toLowerCase();
+    headers.add(last, line.slice(idx + 1));
+  }
+  return { status, headers };
+}
