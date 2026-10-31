@@ -2,6 +2,7 @@ import contentTypeOptions from './content-type-options.js';
 import csp from './csp.js';
 import framing from './framing.js';
 import hsts from './hsts.js';
+import permissionsPolicy from './permissions-policy.js';
 import referrerPolicy from './referrer-policy.js';
 
 /** All checks in the order they are reported. */
@@ -11,4 +12,5 @@ export const CHECKS = Object.freeze([
   framing,
   contentTypeOptions,
   referrerPolicy,
+  permissionsPolicy,
 ]);
