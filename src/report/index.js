@@ -1,5 +1,6 @@
 import { renderJson } from './json.js';
 import { renderMarkdown } from './markdown.js';
+import { renderSarif } from './sarif.js';
 import { renderText } from './text.js';
 
-export const FORMATS = Object.freeze({ text: renderText, json: renderJson, markdown: renderMarkdown });
+export const FORMATS = Object.freeze({ text: renderText, json: renderJson, markdown: renderMarkdown, sarif: renderSarif });
