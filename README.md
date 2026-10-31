@@ -1,9 +1,25 @@
 # headerhawk
 
+[![ci](https://github.com/kirtanbhatt10/headerhawk/actions/workflows/ci.yml/badge.svg)](https://github.com/kirtanbhatt10/headerhawk/actions/workflows/ci.yml)
+![node](https://img.shields.io/badge/node-%3E%3D20-339933)
+![dependencies](https://img.shields.io/badge/dependencies-0-success)
+![license](https://img.shields.io/badge/license-MIT-black)
+
 **Audit the HTTP security headers and cookies of any site, get an A+ to F grade
 and a concrete fix for every finding.** headerhawk is a zero-dependency Node.js
 CLI and library that works on live URLs, saved `curl -I` dumps or piped input,
 and outputs text, JSON, Markdown or SARIF so it can gate deployments in CI.
+
+```text
+$ headerhawk --file test/fixtures/weak.txt
+test/fixtures/weak.txt
+  Grade F (0/100)  16 finding(s), 0 check(s) passed
+  HIGH     cors                  CORS allows any origin together with credentials
+  HIGH     csp                   Content-Security-Policy header missing
+  HIGH     hsts                  Strict-Transport-Security header missing
+  MEDIUM   cookies               cookie "PHPSESSID" is missing HttpOnly
+  ...
+```
 
 ## Install
 
@@ -105,3 +121,15 @@ Tighten the CSP to the sources your site really loads before shipping it.
 headerhawk sends one ordinary `GET` request per target (plus redirects), the
 same as a browser. Only audit sites you own or are allowed to test.
 
+## Development
+
+```bash
+npm test          # node:test, no install step needed
+node bin/headerhawk.js --file test/fixtures/strong.txt
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) to add a check.
+
+## License
+
+[MIT](LICENSE) © Kirtan Bhatt
