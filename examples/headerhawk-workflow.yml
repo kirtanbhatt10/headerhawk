@@ -1,0 +1,17 @@
+# .github/workflows/security-headers.yml: audit your deployed site on every push
+name: security-headers
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 3 * * 1" # weekly, Monday 03:17 UTC
+
+jobs:
+  headers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: kirtanbhatt10/headerhawk@v0.1.0
+        with:
+          urls: https://your-site.example https://api.your-site.example/health
+          fail-under: B
