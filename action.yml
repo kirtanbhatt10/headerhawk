@@ -1,0 +1,40 @@
+name: headerhawk
+description: Audit HTTP security headers and cookies, and fail the job below a grade
+author: Kirtan Bhatt
+branding:
+  icon: shield
+  color: blue
+
+inputs:
+  urls:
+    description: Space-separated URLs to audit
+    required: true
+  fail-under:
+    description: Minimum grade (A+, A, B, C, D) or score (0-100)
+    required: false
+    default: B
+  args:
+    description: Extra headerhawk arguments, e.g. "--ignore cross-origin"
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - name: Run headerhawk
+      shell: bash
+      env:
+        HH_URLS: ${{ inputs.urls }}
+        HH_FAIL_UNDER: ${{ inputs.fail-under }}
+        HH_ARGS: ${{ inputs.args }}
+      run: |
+        set +e
+        # shellcheck disable=SC2086 # word-splitting of URLs and args is intended
+        node "$GITHUB_ACTION_PATH/bin/headerhawk.js" $HH_URLS $HH_ARGS \
+          --format markdown --output headerhawk-report.md --fail-under "$HH_FAIL_UNDER"
+        code=$?
+        [ -f headerhawk-report.md ] && cat headerhawk-report.md >> "$GITHUB_STEP_SUMMARY"
+        exit $code
