@@ -67,3 +67,27 @@ then A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 60 and F below that.
 - `markdown`: a table per target, ready for PR comments or `$GITHUB_STEP_SUMMARY`.
 - `sarif`: SARIF 2.1.0 for GitHub code scanning and other SARIF viewers.
 
+## GitHub Action
+
+```yaml
+- uses: kirtanbhatt10/headerhawk@v0.1.0
+  with:
+    urls: https://your-site.example https://api.your-site.example/health
+    fail-under: B
+```
+
+The Markdown report is added to the job summary. A full workflow is in
+[`examples/headerhawk-workflow.yml`](examples/headerhawk-workflow.yml).
+
+## Library
+
+```js
+import { auditHeaders, auditUrl, parseRaw } from 'headerhawk';
+
+const live = await auditUrl('https://example.com', { timeout: 5000 });
+console.log(live.grade, live.findings);
+
+const { headers } = parseRaw(savedCurlOutput);
+const offline = auditHeaders(headers, { ignore: ['disclosure'] });
+```
+
