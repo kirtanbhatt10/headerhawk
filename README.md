@@ -91,3 +91,17 @@ const { headers } = parseRaw(savedCurlOutput);
 const offline = auditHeaders(headers, { ignore: ['disclosure'] });
 ```
 
+## Fixing what it finds
+
+Copy-paste starting points that score A+:
+
+- nginx: [`examples/nginx-security-headers.conf`](examples/nginx-security-headers.conf)
+- Express, without helmet: [`examples/express-helmet-free.js`](examples/express-helmet-free.js)
+
+Tighten the CSP to the sources your site really loads before shipping it.
+
+## Responsible use
+
+headerhawk sends one ordinary `GET` request per target (plus redirects), the
+same as a browser. Only audit sites you own or are allowed to test.
+
