@@ -1,4 +1,5 @@
 import contentTypeOptions from './content-type-options.js';
+import crossOrigin from './cross-origin.js';
 import csp from './csp.js';
 import framing from './framing.js';
 import hsts from './hsts.js';
@@ -13,4 +14,5 @@ export const CHECKS = Object.freeze([
   contentTypeOptions,
   referrerPolicy,
   permissionsPolicy,
+  crossOrigin,
 ]);
