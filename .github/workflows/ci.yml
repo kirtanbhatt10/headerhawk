@@ -24,3 +24,11 @@ jobs:
         run: node --check bin/headerhawk.js
       - name: Test
         run: npm test
+      - name: Dogfood the CLI
+        run: |
+          node bin/headerhawk.js --list-checks
+          node bin/headerhawk.js --file test/fixtures/strong.txt --fail-under A+
+          if node bin/headerhawk.js --file test/fixtures/weak.txt --fail-under C; then
+            echo "expected the weak fixture to fail the gate" && exit 1
+          fi
+          node bin/headerhawk.js --file test/fixtures/weak.txt --format markdown >> "$GITHUB_STEP_SUMMARY"
