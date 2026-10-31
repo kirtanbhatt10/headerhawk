@@ -34,3 +34,23 @@ headerhawk --list-checks
 | `1` | at least one target scored below `--fail-under` |
 | `2` | usage error, unreadable file or network failure |
 
+## Checks
+
+| Check | Looks at | Example finding |
+| --- | --- | --- |
+| `hsts` | Strict-Transport-Security, plain-HTTP targets | max-age under 6 months, no `includeSubDomains`, broken preload |
+| `csp` | Content-Security-Policy | `'unsafe-inline'` without nonces, `'unsafe-eval'`, `https:`/`*` script sources, no `object-src 'none'` |
+| `framing` | `frame-ancestors`, X-Frame-Options | clickjacking, ignored `ALLOW-FROM` |
+| `content-type-options` | X-Content-Type-Options | missing `nosniff` |
+| `referrer-policy` | Referrer-Policy | `unsafe-url` / `no-referrer-when-downgrade` leaking full URLs |
+| `permissions-policy` | Permissions-Policy, Feature-Policy | camera, microphone or geolocation open to every origin |
+| `cross-origin` | COOP, CORP | missing isolation headers (XS-Leaks) |
+| `cookies` | Set-Cookie | missing Secure / HttpOnly / SameSite, `SameSite=None` without Secure, broken `__Host-` / `__Secure-` prefixes |
+| `cors` | Access-Control-Allow-* | `*` with credentials, trusting the `null` origin |
+| `caching` | Cache-Control on cookie-setting responses | user data stored by shared caches |
+| `disclosure` | Server, X-Powered-By and friends | version numbers and stack fingerprints |
+| `deprecated` | X-XSS-Protection, HPKP, Expect-CT | legacy headers that do more harm than good |
+
+Session-looking cookies (`sid`, `session`, `token`, `auth`…) get stricter
+severities than preference cookies like `theme`.
+
