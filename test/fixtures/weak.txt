@@ -1,0 +1,11 @@
+HTTP/1.1 301 Moved Permanently
+Location: https://shop.example/
+
+HTTP/1.1 200 OK
+Server: nginx/1.18.0 (Ubuntu)
+X-Powered-By: PHP/7.4.3
+Content-Type: text/html; charset=UTF-8
+Set-Cookie: PHPSESSID=abc123; path=/
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+X-XSS-Protection: 1; mode=block
