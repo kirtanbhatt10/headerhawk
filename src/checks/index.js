@@ -1,3 +1,4 @@
+import caching from './caching.js';
 import contentTypeOptions from './content-type-options.js';
 import cookies from './cookies.js';
 import cors from './cors.js';
@@ -19,4 +20,5 @@ export const CHECKS = Object.freeze([
   crossOrigin,
   cookies,
   cors,
+  caching,
 ]);
