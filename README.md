@@ -54,3 +54,16 @@ headerhawk --list-checks
 Session-looking cookies (`sid`, `session`, `token`, `auth`…) get stricter
 severities than preference cookies like `theme`.
 
+## Scoring
+
+Every target starts at 100 and loses **40 / 20 / 10 / 4 / 0** points per
+critical / high / medium / low / info finding. A+ is reserved for a perfect 100,
+then A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 60 and F below that.
+
+## Output formats
+
+- `text`: human-readable, colored in a terminal.
+- `json`: full results, including passed checks and the redirect chain.
+- `markdown`: a table per target, ready for PR comments or `$GITHUB_STEP_SUMMARY`.
+- `sarif`: SARIF 2.1.0 for GitHub code scanning and other SARIF viewers.
+
