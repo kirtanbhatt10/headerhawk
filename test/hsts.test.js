@@ -32,3 +32,19 @@ test('subdomains and preload requirements', () => {
 test('parseHsts tolerates quotes and odd spacing', () => {
   assert.deepEqual(parseHsts(' max-age="31536000" ;IncludeSubDomains'), { maxAge: 31536000, includeSubDomains: true, preload: false });
 });
+
+test('conflicting duplicate headers are flagged and only the first is graded', () => {
+  const found = runCheck(hsts, { [STS]: ['max-age=63072000; includeSubDomains; preload', 'max-age=0'] });
+  assert.deepEqual(titles(found), ['Conflicting Strict-Transport-Security headers']);
+  assert.equal(found[0].severity, 'medium');
+});
+
+test('comma-joined duplicates from a live fetch are split before parsing', () => {
+  const found = runCheck(hsts, { [STS]: 'max-age=63072000; includeSubDomains; preload, max-age=0' });
+  assert.deepEqual(titles(found), ['Conflicting Strict-Transport-Security headers']);
+});
+
+test('identical duplicates are not a conflict', () => {
+  const v = 'max-age=63072000; includeSubDomains';
+  assert.deepEqual(runCheck(hsts, { [STS]: [v, v] }), []);
+});
