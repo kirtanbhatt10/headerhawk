@@ -31,24 +31,41 @@ export default {
     if (value === undefined) {
       return [finding(ID, 'high', 'Strict-Transport-Security header missing', '', RECOMMEND)];
     }
-    const hsts = parseHsts(headers.getAll('strict-transport-security')[0]);
+    // Live fetches comma-join repeated headers; HSTS values never contain commas, so split them back apart.
+    const values = headers
+      .getAll('strict-transport-security')
+      .flatMap((v) => v.split(','))
+      .map((v) => v.trim())
+      .filter(Boolean);
     const out = [];
+    if (new Set(values.map((v) => v.toLowerCase().replace(/\s+/g, ''))).size > 1) {
+      out.push(
+        finding(
+          ID,
+          'medium',
+          'Conflicting Strict-Transport-Security headers',
+          `${values.length} values sent; browsers only honour the first: ${values.join(' | ')}`,
+          'Send HSTS from exactly one layer (app, proxy or CDN) and remove the others.',
+        ),
+      );
+    }
+    const hsts = parseHsts(values[0] ?? value);
     if (hsts.maxAge === null || Number.isNaN(hsts.maxAge)) {
-      out.push(finding(ID, 'high', 'HSTS max-age is missing or invalid', value, RECOMMEND));
+      out.push(finding(ID, 'high', 'HSTS max-age is missing or invalid', values[0] ?? value, RECOMMEND));
       return out;
     }
     if (hsts.maxAge === 0) {
-      out.push(finding(ID, 'high', 'HSTS is disabled with max-age=0', value, RECOMMEND));
+      out.push(finding(ID, 'high', 'HSTS is disabled with max-age=0', values[0] ?? value, RECOMMEND));
       return out;
     }
     if (hsts.maxAge < SIX_MONTHS) {
       out.push(finding(ID, 'medium', 'HSTS max-age is shorter than 6 months', `max-age=${hsts.maxAge}`, RECOMMEND));
     }
     if (!hsts.includeSubDomains) {
-      out.push(finding(ID, 'low', 'HSTS does not cover subdomains', value, 'Add `includeSubDomains` once all subdomains serve HTTPS.'));
+      out.push(finding(ID, 'low', 'HSTS does not cover subdomains', values[0] ?? value, 'Add `includeSubDomains` once all subdomains serve HTTPS.'));
     }
     if (hsts.preload && (!hsts.includeSubDomains || hsts.maxAge < ONE_YEAR)) {
-      out.push(finding(ID, 'low', 'HSTS preload requested but requirements are not met', value, 'Preload needs max-age >= 31536000 and includeSubDomains.'));
+      out.push(finding(ID, 'low', 'HSTS preload requested but requirements are not met', values[0] ?? value, 'Preload needs max-age >= 31536000 and includeSubDomains.'));
     }
     return out;
   },
