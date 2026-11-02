@@ -4,11 +4,16 @@
 ![node](https://img.shields.io/badge/node-%3E%3D20-339933)
 ![dependencies](https://img.shields.io/badge/dependencies-0-success)
 ![license](https://img.shields.io/badge/license-MIT-black)
+![release](https://img.shields.io/github/v/release/kirtanbhatt10/headerhawk)
 
 **Audit the HTTP security headers and cookies of any site, get an A+ to F grade
 and a concrete fix for every finding.** headerhawk is a zero-dependency Node.js
 CLI and library that works on live URLs, saved `curl -I` dumps or piped input,
 and outputs text, JSON, Markdown or SARIF so it can gate deployments in CI.
+
+<p align="center">
+  <img src="docs/demo.svg" alt="headerhawk grading a weak site F with 16 findings, a hardened site A+, and blocking a deploy below grade B" width="100%">
+</p>
 
 ```text
 $ headerhawk --file test/fixtures/weak.txt
@@ -24,9 +29,10 @@ test/fixtures/weak.txt
 ## Install
 
 ```bash
-npm install -g github:kirtanbhatt10/headerhawk
+npm install -g github:kirtanbhatt10/headerhawk#v0.2.0
 # or run it without installing
-npx github:kirtanbhatt10/headerhawk https://example.com
+npx github:kirtanbhatt10/headerhawk#v0.2.0 https://example.com
+# or grab headerhawk-0.2.0.tgz from the GitHub release and `npm install -g ./headerhawk-0.2.0.tgz`
 ```
 
 Requires Node.js 20 or newer. No dependencies.
@@ -86,7 +92,7 @@ then A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 60 and F below that.
 ## GitHub Action
 
 ```yaml
-- uses: kirtanbhatt10/headerhawk@v0.1.0
+- uses: kirtanbhatt10/headerhawk@v0.2.0   # or @v0 to follow the latest 0.x release
   with:
     urls: https://your-site.example https://api.your-site.example/health
     fail-under: B

@@ -1,6 +1,6 @@
 {
   "name": "headerhawk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Zero-dependency HTTP security header and cookie auditor with A+ to F grades, SARIF output and CI gating",
   "type": "module",
   "bin": {
@@ -8,6 +8,10 @@
   },
   "exports": {
     ".": "./src/index.js"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "files": [
     "bin",
@@ -28,7 +32,10 @@
     "cookies",
     "sarif",
     "cli",
-    "appsec"
+    "appsec",
+    "devsecops",
+    "github-action",
+    "owasp"
   ],
   "author": "Kirtan Bhatt <kirtan11bhatt@gmail.com>",
   "license": "MIT",
