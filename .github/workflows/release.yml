@@ -1,0 +1,80 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  release:
+    types: [published]
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test before release
+        run: npm test
+      - name: Check tag matches package.json and the CLI
+        run: |
+          pkg="v$(node -p "require('./package.json').version")"
+          cli="v$(node bin/headerhawk.js --version | awk '{print $NF}')"
+          test "$pkg" = "$GITHUB_REF_NAME" || { echo "tag $GITHUB_REF_NAME != package.json $pkg"; exit 1; }
+          test "$cli" = "$GITHUB_REF_NAME" || { echo "tag $GITHUB_REF_NAME != CLI $cli"; exit 1; }
+      - name: Pack the npm tarball
+        run: npm pack
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: headerhawk-*.tgz
+
+  github-release:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: package
+      - name: Attach the tarball to the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" headerhawk-*.tgz --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" headerhawk-*.tgz --generate-notes
+          fi
+      - name: Move the major-version tag (v0) to this release so the action ref tracks it
+        run: |
+          major="${GITHUB_REF_NAME%%.*}"
+          git tag -f "$major" "$GITHUB_SHA"
+          git push -f origin "refs/tags/$major"
+
+  npm:
+    # Off until an npm token is added: create the NPM_TOKEN secret and set repo variable PUBLISH_TO_NPM=true.
+    if: vars.PUBLISH_TO_NPM == 'true'
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
