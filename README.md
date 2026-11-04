@@ -17,14 +17,33 @@ and outputs text, JSON, Markdown or SARIF so it can gate deployments in CI.
 
 ```text
 $ headerhawk --file test/fixtures/weak.txt
+headerhawk 0.2.0
+
 test/fixtures/weak.txt
   Grade F (0/100)  16 finding(s), 0 check(s) passed
   HIGH     cors                  CORS allows any origin together with credentials
+                                 Access-Control-Allow-Origin: * with Allow-Credentials: true
+                                 fix: Reflect only an allowlist of trusted origins when credentials are needed.
   HIGH     csp                   Content-Security-Policy header missing
+                                 fix: Start from `default-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'` and add sources as needed.
   HIGH     hsts                  Strict-Transport-Security header missing
-  MEDIUM   cookies               cookie "PHPSESSID" is missing HttpOnly
+                                 fix: Send `Strict-Transport-Security: max-age=31536000; includeSubDomains` on every HTTPS response.
   ...
 ```
+
+Every finding comes with the evidence it was based on (when there is any) and a
+`fix:` line you can act on.
+
+## Contents
+
+- [Install](#install)
+- [Usage](#usage) and [options](#options)
+- [Checks](#checks) and [scoring](#scoring)
+- [Output formats](#output-formats)
+- [GitHub Action](#github-action)
+- [Library](#library)
+- [Fixing what it finds](#fixing-what-it-finds)
+- [Development](#development)
 
 ## Install
 
@@ -49,6 +68,21 @@ headerhawk example.com --fail-under B                # exit 1 below grade B (or 
 headerhawk example.com --ignore cross-origin,disclosure
 headerhawk --list-checks
 ```
+
+### Options
+
+| Option | Description |
+| --- | --- |
+| `-f, --file <path>` | audit a saved header dump (repeatable) |
+| `--stdin` | read a header dump from stdin |
+| `-F, --format <fmt>` | `text`, `json`, `markdown` or `sarif` (default: `text`) |
+| `-o, --output <path>` | write the report to a file instead of stdout |
+| `--fail-under <min>` | exit 1 if a target scores below a grade (`A+`, `A`, `B`, `C`, `D`) or a number 0-100 |
+| `--ignore <ids>` | comma-separated check ids to skip (see `--list-checks`) |
+| `--timeout <ms>` | request timeout in milliseconds (default: `10000`) |
+| `--no-color` | disable colors in text output |
+| `--list-checks` | list available checks |
+| `-h, --help` / `-v, --version` | show help / the version |
 
 | Exit code | Meaning |
 | --- | --- |
@@ -98,7 +132,14 @@ then A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 60 and F below that.
     fail-under: B
 ```
 
-The Markdown report is added to the job summary. A full workflow is in
+| Input | Required | Default | Description |
+| --- | --- | --- | --- |
+| `urls` | yes | | space-separated URLs to audit |
+| `fail-under` | no | `B` | minimum grade (`A+`, `A`, `B`, `C`, `D`) or score (0-100) |
+| `args` | no | `""` | extra headerhawk arguments, e.g. `--ignore cross-origin` |
+
+The Markdown report is added to the job summary, and the step fails when any
+target scores below `fail-under`. A full workflow is in
 [`examples/headerhawk-workflow.yml`](examples/headerhawk-workflow.yml).
 
 ## Library
@@ -112,6 +153,10 @@ console.log(live.grade, live.findings);
 const { headers } = parseRaw(savedCurlOutput);
 const offline = auditHeaders(headers, { ignore: ['disclosure'] });
 ```
+
+Each result has `target`, `score`, `grade`, `findings` and `passed`. The package
+also exports `fetchHeaders`, `CHECKS`, `grade`, `score`, `meetsGrade`, `FORMATS`
+and `VERSION`.
 
 ## Fixing what it finds
 
