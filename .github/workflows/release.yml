@@ -31,7 +31,7 @@ jobs:
           test "$cli" = "$GITHUB_REF_NAME" || { echo "tag $GITHUB_REF_NAME != CLI $cli"; exit 1; }
       - name: Pack the npm tarball
         run: npm pack
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: package
           path: headerhawk-*.tgz
